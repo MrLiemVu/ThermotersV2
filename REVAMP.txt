@@ -3,3 +3,6 @@ Shuffled_matrices [plots].ipynb
 
 Shuffled_matrices [create histogram].ipynb
     nbdumps/shuffled_matrix_genome_free_energies_without_pw.dmp
+
+General_functions
+    Get MCMC To work

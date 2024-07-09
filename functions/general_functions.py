@@ -211,12 +211,6 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-
-
-# if __name__=='__main__':
-extraColors = [ u'firebrick', u'darkolivegreen', u'indigo', u'indianred', u'darkseagreen', u'tomato', u'darkgoldenrod', u'lightblue', u'orangered', u'lime', u'darkslategrey', u'burlywood', u'dimgray', u'darkslategray', u'brown', u'dodgerblue', u'peru', u'chocolate', u'crimson', u'forestgreen', u'fuchsia', u'slateblue', u'olive']
-
-
 def stochasticMaximize(fun,x0,steps = 10000, temp = 1., step = .1):
     '''
     Stochastic optimization of a function.
@@ -236,7 +230,7 @@ def stochasticMaximize(fun,x0,steps = 10000, temp = 1., step = .1):
     from MCMC import MCMC
     
     global exponent, mcmc
-    execfile('MCMCworker_RNApOnly_exclusions.py')
+    exec(open('MCMCworker_RNApOnly_exclusions.py').read())
     from os.path import expanduser
     nPars = len(x0)
     exponent = fun
@@ -271,7 +265,7 @@ def deep_getsizeof(o, ids):
     r = getsizeof(o)
     ids.add(id(o))
  
-    if isinstance(o, str) or isinstance(0, unicode):
+    if isinstance(o, str): # Removed isinstance(o, unicode) as it is not defined in Python 3
         return r
  
     if isinstance(o, Mapping):
