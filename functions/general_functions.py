@@ -68,9 +68,20 @@ def autocorr(sett, dtrange, nsplits = 1):
         return ( mean(out,axis=0), std(out,axis=0) )
 
 def OU(theta,mu,sigma,tmax,x0,dt):
+    '''
+    Simulate an Ornstein-Uhlenbeck process with parameters theta, mu, sigma
+    and initial condition x0 for a time tmax with time step dt.
+    
+    Parameters:
+    
+    Returns
+    '''
+    from random import randn
+    from numpy import empty
+    
     maxindex = int(float(tmax)/dt)
-    x=empty(maxindex)
-    x[0]=x0
+    x = empty(maxindex)
+    x[0] = x0
     w  = randn(maxindex)
     a1 = 1.-theta*dt
     a2 = mu*theta*dt
@@ -88,7 +99,7 @@ def order(testlist):
 def tally(mylist):
     from collections import Counter
     import numpy as np
-    return sorted(Counter(mylist).most_common(),key=lambda duple: duple[0])
+    return sorted(Counter(mylist).most_common(), key=lambda duple: duple[0])
 
 
 def multi_map(some_function, iterable, processes=1):
@@ -131,7 +142,7 @@ def stochasticMaximize(fun,x0,steps = 10000, temp = 1., step = .1):
     from os.path import expanduser
     nPars = len(x0)
     exponent = fun
-    mcmc=MCMC(x0, Nsave=10*nPars, filename=expanduser('~/tmp/mcmc'), step = step, temp = temp, exclude=np.array([],dtype=int))
+    mcmc = MCMC(x0, Nsave=10*nPars, filename=expanduser('~/tmp/mcmc'), step = step, temp = temp, exclude=np.array([],dtype=int))
     mcmc.cycle(steps,adjust=True)
     outPars = np.loadtxt(mcmc.filename+".out", skiprows=steps//10//nPars*9//10)[:,1:-1].mean(axis=0)
     return outPars, fun(outPars)
