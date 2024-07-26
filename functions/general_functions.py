@@ -1,4 +1,8 @@
 
+# Imports
+from collections.abc import Mapping, Container
+from sys import getsizeof
+
 # find positions of elements in the list
 def pozicija(testlist,cond):
     return [i for i,x in enumerate(testlist) if cond(x)]
@@ -67,35 +71,37 @@ def autocorr(sett, dtrange, nsplits = 1):
         out = array(out)
         return ( mean(out,axis=0), std(out,axis=0) )
 
-def OU(theta,mu,sigma,tmax,x0,dt):
-    maxindex = int(float(tmax)/dt)
-    x=empty(maxindex)
-    x[0]=x0
-    w  = randn(maxindex)
-    a1 = 1.-theta*dt
-    a2 = mu*theta*dt
-    b  = sigma*dt**.5*w
+def OU(theta, mu, sigma, tmax, x0, dt):
+    from numpy import empty, randn
+    maxindex = int(float(tmax) / dt)
+    x = empty(maxindex)
+    x[0] = x0
+    w = randn(maxindex)
+    a1 = 1.0 - theta * dt
+    a2 = mu * theta * dt
+    b  = sigma * dt**.5 *w
     for t in range(maxindex-1):
-        x[t+1] = a1*x[t] - a2 + b[t]
+        x[t + 1] = a1 * x[t] - a2 + b[t]
     return x
 
 
 def order(testlist):
     import numpy as np
-    tmp = sorted([[i,el] for i,el in enumerate(testlist)], key=lambda xi: xi[1])
+
+    tmp = sorted([[i, el] for i, el in enumerate(testlist)], key=lambda xi: xi[1])
     return np.array([el[0] for el in tmp])
     
 def tally(mylist):
-    from collections import Counter
-    import numpy as np
+    from collections import Counter    
+
     return sorted(Counter(mylist).most_common(),key=lambda duple: duple[0])
 
 
 def multi_map(some_function, iterable, processes=1):
     assert type(processes) == int
-    if processes==1:
+    if processes == 1:
         out = map(some_function, iterable)
-    elif processes>1:
+    elif processes > 1:
         from multiprocessing import Pool
         pool = Pool(processes)
         out  = pool.map(some_function, iterable)
@@ -111,6 +117,7 @@ from contextlib import contextmanager
 @contextmanager
 def suppress_stdout():
     import sys, os
+
     with open(os.devnull, "w") as devnull:
         old_stdout = sys.stdout
         sys.stdout = devnull
@@ -126,21 +133,19 @@ extraColors = [ u'firebrick', u'darkolivegreen', u'indigo', u'indianred', u'dark
 
 
 def stochasticMaximize(fun,x0,steps = 10000, temp = 1., step = .1):
-    global exponent, mcmc
+    global exponent, MCMC
     execfile('MCMCworker_RNApOnly_exclusions.py')
     from os.path import expanduser
+    import numpy as np
+
     nPars = len(x0)
     exponent = fun
-    mcmc=MCMC(x0, Nsave=10*nPars, filename=expanduser('~/tmp/mcmc'), step = step, temp = temp, exclude=np.array([],dtype=int))
+    mcmc = MCMC(x0, Nsave=10*nPars, filename=expanduser('~/tmp/mcmc'), step = step, temp = temp, exclude=np.array([],dtype=int))
     mcmc.cycle(steps,adjust=True)
     outPars = np.loadtxt(mcmc.filename+".out", skiprows=steps//10//nPars*9//10)[:,1:-1].mean(axis=0)
     return outPars, fun(outPars)
-
-
-from collections import Mapping, Container
-from sys import getsizeof
  
-def deep_getsizeof(o, ids):
+def deep_getsizeof(obj, ids):
     """Find the memory footprint of a Python object
  
     This is a recursive function that drills down a Python object graph
@@ -155,20 +160,23 @@ def deep_getsizeof(o, ids):
     :param ids:
     :return:
     """
+    from collections.abc import Mapping, Container
+    from sys import getsizeof
+
     d = deep_getsizeof
-    if id(o) in ids:
+    if id(obj) in ids:
         return 0
  
-    r = getsizeof(o)
-    ids.add(id(o))
+    curr_size = getsizeof(obj)
+    ids.add(id(obj))
  
-    if isinstance(o, str) or isinstance(0, unicode):
-        return r
+    if isinstance(obj, str) or isinstance(0, str):
+        return curr_size
  
-    if isinstance(o, Mapping):
-        return r + sum(d(k, ids) + d(v, ids) for k, v in o.iteritems())
+    if isinstance(obj, Mapping):
+        return curr_size + sum(d(key, ids) + d(val, ids) for key, val in obj.iteritems())
  
-    if isinstance(o, Container):
-        return r + sum(d(x, ids) for x in o)
+    if isinstance(obj, Container):
+        return curr_size + sum(d(x, ids) for x in obj)
  
-    return r 
+    return curr_size 
