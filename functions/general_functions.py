@@ -232,7 +232,6 @@ def stochasticMaximize(fun,x0,steps = 10000, temp = 1., step = .1):
         fun(outPars) : The value of the function at the optimized parameters.
     '''
     import numpy as np
-    from MCMC import MCMC
     
     global exponent, MCMC
     exec(open('MCMCworker_RNApOnly_exclusions.py').read())
