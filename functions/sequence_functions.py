@@ -5,25 +5,48 @@ from Bio import pairwise2
 
 
 def hamming_distance(s1, s2):
-    """Return the Hamming distance between equal-length sequences"""
+    '''Return the Hamming distance between equal-length sequences'''
     if len(s1) != len(s2):
         raise ValueError("Undefined for sequences of unequal length")
     return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
 def aln(seq1, seq2):
+    '''Returns the alignment of two sequences.'''
     return pairwise2.align.localms(seq1, seq2, 1, 0, -1.1, -.5)[0]
     
 def printaln(alignment):
+    '''Prints the alignment of two sequences.'''
     print (pairwise2.format_alignment(*alignment))
 
-def askn(smth,n):
-    try:    out = smth[n]
-    except: out = None
+def askn(list, n):
+    '''
+    Returns the n-th element of a list, or None if it doesn't exist.
+    
+    Parameters:
+        list : The list.
+        n : The index.
+    
+    Returns:
+        out : The n-th element of the list, or None if it doesn't exist.
+    '''
+    try:    
+        out = list[n]
+    except: 
+        out = None
     return out
 
-def get_diffs(wt,seq):
-    """Outputs the differences between the first sequence
-    (usually the wild type) and the second oneM"""
+def get_diffs(wt, seq):
+    '''
+    Outputs the differences between the first sequence
+    (usually the wild type) and the second oneM
+    
+    Parameters:
+        wt : The wild type sequence.
+        seq : The mutated sequence.
+    
+    Returns:
+        out : The differences between the two sequences.
+    '''
     assert len(seq)==len(wt)
     while wt[-1]=="-":
 #         print "wild type ends with '-'!"
@@ -57,7 +80,19 @@ def get_diffs(wt,seq):
 #         if show: printseqs(s1,s2)
 #         return   get_diffs(s1,s2)
 
-def compare_to(wt,mut,trimmed = False, show = False):
+def compare_to(wt, mut, trimmed=False, show=False):
+    '''
+    Compares two sequences and returns the differences between them.
+    
+    Parameters:
+        wt : The wild type sequence.
+        mut : The mutated sequence.
+        trimmed : Whether to trim the sequences. Default is False.
+        show : Whether to print the sequences. Default is False.
+    
+    Returns:
+        out : The differences between the two sequences.
+    '''
     myaln = aln(wt, mut)
     try:
         (s1, s2, sc, bb, ee) = myaln[0]
@@ -76,7 +111,18 @@ def compare_to(wt,mut,trimmed = False, show = False):
             printseqs(s1,s2)
         return   get_diffs(s1,s2)
 
-def printseqs(seq1, seq2, onlySecond=False):            
+def printseqs(seq1, seq2, onlySecond=False):         
+    '''
+    Prints the alignment of two sequences.
+    
+    Parameters:
+        seq1 : The first sequence.
+        seq2 : The second sequence.
+        onlySecond : Whether to print only the second sequence. Default is False.
+    
+    Returns:   
+        None
+    '''   
     assert len(seq1)==len(seq2)
     if not onlySecond:
         print (seq1)
