@@ -6,3 +6,7 @@ Shuffled_matrices [create histogram].ipynb
 
 General_functions
     Get MCMC To work
+
+data_functions, missing
+
+fastFunctions, how to set up

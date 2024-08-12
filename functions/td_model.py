@@ -1,10 +1,15 @@
-import numpy as np
-from general_functions import multi_map
-try: from scipy.special import logsumexp
-except: from scipy.misc import logsumexp
-from fastFunctions import tensum, bindingEnergies, getDiNu
+from sys import path as syspath
+syspath.append("../")
 
-from model_functions import getBricks
+import numpy as np
+from .general_functions import multi_map
+from .model_functions import getBricks
+try: 
+    from scipy.special import logsumexp
+except: 
+    from scipy.misc import logsumexp
+from .fastFunctions import tensum, bindingEnergies, getDiNu
+
 class ThermodynamicModel:
     def __init__(self, parameters):
         self.params = dict(parameters)

@@ -5,9 +5,20 @@ import numpy as np
 linReg = LinearRegression()
 
 def dict2tdm(model, treat_as = "36N"):
+    '''
+    Convert a dictionary to a ThermodynamicModel object.
+    
+    Parameters:
+        model : Dictionary representation of hte model
+        treat_as : The key to treat the model as
+    
+    Returns:
+        a : ThermodynamicModel
+    '''
     a = {}
     for k in model:
-        if k in ["DataIDs","Layout","en.scale"]: continue
+        if k in ["DataIDs","Layout","en.scale"]: 
+            continue
         if isinstance(model[k], dict) and treat_as in model[k]:
             a[k] = model[k][treat_as]
         else:
@@ -17,6 +28,23 @@ def dict2tdm(model, treat_as = "36N"):
     return ThermodynamicModel(a)
 
 def evaluate_model(model_, bricks_, delta_mu, detection_th, loglums, weights=None, ax=None, c=None, forceLinear=False):
+    '''
+    Evaluate a model.
+    
+    Parameters:
+        model_ : ThermodynamicModel - The thermodynamic model
+        bricks_ : dict - The bricks
+        delta_mu : float - The delta mu
+        detection_th : float - The detection threshold
+        loglums : numpy array - The loglums
+        weights : numpy array - The weights
+        ax : matplotlib axis - The axis
+        c : str - The color
+        forceLinear : bool - Whether to force linear regression
+    
+    Returns:
+        score : float
+    '''
     pons_ = model_.bricks2pons({k:bricks_[k]-delta_mu for k in bricks_})
     x = np.log10(pons_)
     xmin = min(detection_th, np.percentile(x[np.isfinite(x)],.01))

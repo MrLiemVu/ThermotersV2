@@ -123,13 +123,17 @@ def printseqs(seq1, seq2, onlySecond=False):
     Returns:   
         None
     '''   
+    # Check that the sequences have the same length
     assert len(seq1)==len(seq2)
+    
     if not onlySecond:
         print (seq1)
     s2 = ""
-    for l1,l2 in zip(seq1,seq2):
-        if l1==l2: s2 += " "
-        else: s2 += l2
+    for l1, l2 in zip(seq1, seq2):
+        if l1 == l2: 
+            s2 += " "
+        else: 
+            s2 += l2
     print (s2) #, " ", len(s2.split())
 
 
