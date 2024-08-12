@@ -1,14 +1,9 @@
 ## Definitions:
 from collections import OrderedDict
 import numpy as np
-# from copy import deepcopy
-# from general_functions import tally,mode
 from general_functions import multi_map
-
-try:
-    from scipy.special import logsumexp
-except:
-    from scipy.misc import logsumexp
+# from scipy.special import logsumexp
+from scipy.misc import logsumexp
 
 from fastFunctions import tensum, bindingEnergies, getDiNu
     
@@ -250,6 +245,19 @@ def lps2eval(fitpar, objF, numData,
 
     
 def reprBigM(theFitPars):
+    '''
+    Returns a big matrix with the matrices from theFitPars
+    separated by Lspacer rows of NaNs.
+    
+    Parameters:
+        theFitPars: dict
+            the dictionary with the fit parameters
+    
+    Returns:
+        bigM: np.array
+            the big matrix with the matrices separated by Lspacer rows of NaNs
+    '''
+    
     Lspacer = theFitPars["Layout"][1]
     ms = [m-np.repeat(m.min(axis=1),4).reshape(-1,4) for m in theFitPars["matrices"]]
     bigM = np.vstack([ms[0]]+

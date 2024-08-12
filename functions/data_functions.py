@@ -53,7 +53,7 @@ def createNumData(
                 fltr = DataDict[dataID]["data split"].isin(tt.split("+"))
                 data = DataDict[dataID][ fltr ]
             seqs = numerizeSequences(data['sequence'],
-#                                      rcrop =10 if dataID=="36N" else 14,
+#                                      rcrop = 10 if dataID=="36N" else 14,
 #                                      Ltot = 100 if dataID=="36N" else 120
                                      Ltot = 115
                                     )
