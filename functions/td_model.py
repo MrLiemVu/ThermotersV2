@@ -9,21 +9,20 @@ class ThermodynamicModel:
     def __init__(self, parameters):
         self.params = dict(parameters)
 
-    '''
-    Converts a sequence of DNA to bricks for both forward and reverse complement strands.
-    
-    Inputs:
-    - seqs: a 2D numpy array of shape (n, L) where n is the number of sequences and L is the length of each sequence.
-    - dinuCoordsAndValues: a tuple of two lists. The first list contains the coordinates of 
-                           dinucleotides in the sequence and the second list contains the values of the dinucleotides.
-    
-    Outputs:
-    - bricks: a dictionary with keys "frw" and "rc" where the values are 2D numpy arrays
-              of shape (n, L) representing the bricks for the forward and reverse complement
-              strands respectively.
-    '''
     def sequences2bricks(self, seqs, dinuCoordsAndValues=None):
+        '''
+        Converts a sequence of DNA to bricks for both forward and reverse complement strands.
         
+        Parameters:
+          seqs: a 2D numpy array of shape (n, L) where n is the number of sequences and L is the length of each sequence.
+          dinuCoordsAndValues: a tuple of two lists. The first list contains the coordinates of 
+                            dinucleotides in the sequence and the second list contains the values of the dinucleotides.
+        
+        Outputs:
+          bricks: a dictionary with keys "frw" and "rc" where the values are 2D numpy arrays
+                of shape (n, L) representing the bricks for the forward and reverse complement
+                strands respectively.
+        '''
         # 1. Extract the dinucleotide coordinates and values
         if dinuCoordsAndValues is not None:
             dinuCoords, dinuValues = dinuCoordsAndValues
@@ -77,7 +76,7 @@ class ThermodynamicModel:
     Converts bricks to Pons for a given set of bricks.
     
     Inputs:
-    - bricks: a dictionary with keys "frw" and "rc" where the values are 2D numpy arrays
+      bricks: a dictionary with keys "frw" and "rc" where the values are 2D numpy arrays
               of shape (n, L) representing the bricks for the forward and reverse complement
               strands respectively.
     '''
