@@ -8,6 +8,16 @@ from scipy.misc import logsumexp
 from fastFunctions import tensum, bindingEnergies, getDiNu
     
 def slideSingleMatrix(m, seqs):
+    '''
+    Calculate the energy of binding for each sequence in a matrix.
+    
+    Inputs:
+        m: numpy array
+        seqs: numpy array
+        
+    Outputs:
+        np.array([bindingEnergies(m,seqs[:,offset:offset+m.shape[0]]) for offset in range(Lout)]).T: numpy array
+    '''
     Lout = seqs.shape[1]-m.shape[0]+1
     return np.array([bindingEnergies(m,seqs[:,offset:offset+m.shape[0]]) for offset in range(Lout)]).T
 
@@ -16,7 +26,19 @@ def getBricks(twoMatrices,
               spacerPenalties,
               sequences,
               makeLengthConsistent=False):
-
+    '''
+    Calculate the energy of binding for each sequence in a matrix.
+    
+    Inputs:
+        twoMatrices: list of numpy arrays
+        minSpacer: int
+        spacerPenalties: numpy array
+        sequences: numpy array
+        makeLengthConsistent: boolean
+        
+    Outputs:
+        effergies: numpy array
+    '''
     n1, n2 = [m.shape[0] for m in twoMatrices]
     nSpacer = len(spacerPenalties)
     nSeq, seqL = sequences.shape
@@ -27,28 +49,28 @@ def getBricks(twoMatrices,
                   ])
     if makeLengthConsistent:    
         # works only if the center spacer Penalty is 0
-        spFlex = nSpacer//2
-        assert spacerPenalties[spFlex]==0
-        Lmatrix = minSpacer+n1+n2+spFlex
-        Lbrick = seqL-Lmatrix+1
-        effergies = np.ones((nSpacer,Lbrick,nSeq))*100  # large number so it vanishes when exp(-#)
+        spFlex = nSpacer // 2
+        assert spacerPenalties[spFlex] == 0
+        Lmatrix = minSpacer + n1 + n2 + spFlex
+        Lbrick = seqL-Lmatrix + 1
+        effergies = np.ones((nSpacer, Lbrick, nSeq)) * 100  # large number so it vanishes when exp(-#)
         for iS in range(nSpacer):
             try:
-                tmp =  energyBoxes[0,:energyBoxes.shape[1]-iS]\
-                                   +energyBoxes[1,iS:]\
-                                   +spacerPenalties[iS]
+                tmp = energyBoxes[0, :energyBoxes.shape[1] - iS] \
+                                   + energyBoxes[1, iS:] \
+                                   + spacerPenalties[iS]
     #             print (tmp.shape,Lbrick)
                 tmp = tmp[-Lbrick:]
                 effergies[iS][-tmp.shape[0]:] = tmp
             except:
                 pass
     else:
-        effergies = [np.array(  energyBoxes[0,:energyBoxes.shape[1]-iS] \
-                               +energyBoxes[1,iS:]
-                               +spacerPenalties[iS])
+        effergies = [np.array(   energyBoxes[0, :energyBoxes.shape[1] - iS] \
+                               + energyBoxes[1, iS:]
+                               + spacerPenalties[iS])
                      for iS in range(nSpacer)]
         # to align the sequences by right-flushing
-        effergies = np.array([effergies[iS][nSpacer-iS:] for iS in range(nSpacer)])
+        effergies = np.array([effergies[iS][nSpacer - iS:] for iS in range(nSpacer)])
 
     return effergies
 
@@ -57,6 +79,21 @@ def getBrickDict(seqDict,mdl,dinucl=False,
                  useChemPot="chem.pot",
                  makeLengthConsistent=False,
                  dinuCoordsAndValues = None):
+    '''
+    Calculate the energy of binding for each sequence in a dictionary of sequences.
+    
+    Inputs:
+        seqDict: dictionary of numpy arrays
+        mdl: dictionary
+        dinucl: boolean
+        subtractChemPot: boolean
+        useChemPot: string
+        makeLengthConsistent: boolean
+        dinuCoordsAndValues: tuple
+        
+    Outputs:
+        out: dictionary of numpy arrays
+    '''
     if dinucl:
         dinuCoords, dinuValues = dinuCoordsAndValues
     out = OrderedDict()
@@ -67,7 +104,7 @@ def getBrickDict(seqDict,mdl,dinucl=False,
         for strand in strands:
             sq = seqDict[did]
             if strand:
-                sq = 3-sq[:,::-1].copy(order="C")
+                sq = 3-sq[:, ::-1].copy(order="C")
             tmp = getBricks(
                 mdl["matrices"],
                 mdl["min.spacer"],
@@ -103,10 +140,10 @@ def getBrickDict(seqDict,mdl,dinucl=False,
 #                         sequences=sq,
 #                         nSpacer=len(mdl["sp.penalties"])).T
 #                     for coord in dinuCoords])
-                tmp += np.array(tensum(dinuValues,tmpDn))
+                tmp += np.array(tensum(dinuValues, tmpDn))
             if strand:
-                tmp = tmp[:,::-1]
-            out[did+"_rc"*strand] = tmp
+                tmp = tmp[:, ::-1]
+            out[did + "_rc" * strand] = tmp
     return out
 
 
@@ -117,6 +154,19 @@ def brick2lps(bricks_DNIs,
               bindMode_ = None,
               useChemPot = "chem.pot"
              ):
+    '''
+    Calculate the log10 of the probability of occupancy for each sequence in a dictionary of bricks.
+    
+    Inputs:
+        bricks_DNIs: dictionary of numpy arrays
+        fitpars: dictionary
+        thresholdPosDict_: dictionary
+        bindMode_: string
+        useChemPot: string
+        
+    Outputs:
+        out: dictionary of numpy arrays
+    '''
     out = {}               
     if thresholdPosDict_ is None:
         thresholdPosDict_ = fitpars["ThDict"]
@@ -127,41 +177,41 @@ def brick2lps(bricks_DNIs,
     except:
         R_ = None
     for dataID_ in bricks_DNIs:
-        if "_rc" in dataID_: continue
-        
+        if "_rc" in dataID_: 
+            continue
         bdni = bricks_DNIs[dataID_]
         
         try:
-            thresholdPos = thresholdPosDict_.get(dataID_,thresholdPosDict_["Prl"])
+            thresholdPos = thresholdPosDict_.get(dataID_, thresholdPosDict_["Prl"])
         except:
             for k in thresholdPosDict_:
                 if dataID_ in k:
                     thresholdPos = thresholdPosDict_[k]
                     break
-        if thresholdPos<=0:
-            thresholdPos = bdni.shape[1]+thresholdPos
+        if thresholdPos <= 0:
+            thresholdPos = bdni.shape[1] + thresholdPos
 
         off = thresholdPos<bdni.shape[1]
         if bindMode_ == "add":
             if R_ is None:
-                bindF = lambda xi: -logsumexp(-xi,axis=tuple(range(1,xi.ndim)))
+                bindF = lambda xi: -logsumexp(-xi, axis = tuple(range(1, xi.ndim)))
             else:
                 bindF = lambda xi: -np.log(np.sum(
-                                    1./(np.exp(xi)+R_),
-                                    axis=tuple(range(1,xi.ndim))
+                                    1.0/(np.exp(xi) + R_),
+                                    axis = tuple(range(1,xi.ndim))
                                             ))
         if bindMode_ == "max":
-            bindF = lambda xi: np.min(xi,axis=tuple(range(1,xi.ndim)))
-        effON_  =     bindF(bdni[:,:thresholdPos])
+            bindF = lambda xi: np.min(xi, axis = tuple(range(1, xi.ndim)))
+        effON_ = bindF(bdni[:, :thresholdPos])
         if off:
-            effOFF_ = bindF(bdni[:,thresholdPos:])
+            effOFF_ = bindF(bdni[:, thresholdPos:])
         else:
             effOFF_ = 0.
-        if dataID_+"_rc" in bricks_DNIs:
-            bdni_rc = bricks_DNIs[dataID_+"_rc"]
-            rcOcclusion = fitpars.get("rcOcclusion",np.arange(bdni_rc.shape[1]))
-            effOFF_ += bindF(bdni_rc[:,rcOcclusion])
-        Pons_ = np.exp(-effON_)/(1.+np.exp(-effON_)+np.exp(-effOFF_))
+        if dataID_ + "_rc" in bricks_DNIs:
+            bdni_rc = bricks_DNIs[dataID_ + "_rc"]
+            rcOcclusion = fitpars.get("rcOcclusion", np.arange(bdni_rc.shape[1]))
+            effOFF_ += bindF(bdni_rc[:, rcOcclusion])
+        Pons_ = np.exp(-effON_) / (1.0 + np.exp(-effON_) + np.exp(-effOFF_))
         out[dataID_] = np.log10(Pons_)
     return out
     

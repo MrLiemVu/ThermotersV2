@@ -1,4 +1,8 @@
 
+# Imports
+from collections.abc import Mapping, Container
+from sys import getsizeof
+
 # find positions of elements in the list
 def pozicija(testlist, cond):
     '''
@@ -135,8 +139,7 @@ def OU(theta,mu,sigma,tmax,x0,dt):
     a2 = mu*theta*dt
     b  = sigma*dt**.5*w
     for t in range(maxindex-1):
-        x[t+1] = a1*x[t] - a2 + b[t]
-    
+        x[t + 1] = a1 * x[t] - a2 + b[t]
     return x
 
 
@@ -152,7 +155,8 @@ def order(testlist):
     '''
     import numpy as np
     
-    tmp = sorted([[i,el] for i,el in enumerate(testlist)], key=lambda xi: xi[1])
+
+    tmp = sorted([[i, el] for i, el in enumerate(testlist)], key=lambda xi: xi[1])
     return np.array([el[0] for el in tmp])
     
 def tally(mylist):
@@ -183,9 +187,9 @@ def multi_map(some_function, iterable, processes=1):
         out : The output of the function applied to the iterable.
     '''
     assert type(processes) == int
-    if processes==1:
+    if processes == 1:
         out = map(some_function, iterable)
-    elif processes>1:
+    elif processes > 1:
         from multiprocessing import Pool
         pool = Pool(processes)
         out  = pool.map(some_function, iterable)
@@ -203,6 +207,7 @@ def suppress_stdout():
     ''' Suppress the output of a block of code. '''
     import sys, os
     
+
     with open(os.devnull, "w") as devnull:
         old_stdout = sys.stdout
         sys.stdout = devnull
@@ -227,20 +232,21 @@ def stochasticMaximize(fun,x0,steps = 10000, temp = 1., step = .1):
         fun(outPars) : The value of the function at the optimized parameters.
     '''
     import numpy as np
-    from MCMC import MCMC
     
-    global exponent, mcmc
+    global exponent, MCMC
     exec(open('MCMCworker_RNApOnly_exclusions.py').read())
     from os.path import expanduser
+    import numpy as np
+
     nPars = len(x0)
     exponent = fun
+    mcmc = MCMC(x0, Nsave=10*nPars, filename=expanduser('~/tmp/mcmc'), step = step, temp = temp, exclude=np.array([],dtype=int))
     mcmc = MCMC(x0, Nsave=10*nPars, filename=expanduser('~/tmp/mcmc'), step = step, temp = temp, exclude=np.array([],dtype=int))
     mcmc.cycle(steps,adjust=True)
     outPars = np.loadtxt(mcmc.filename+".out", skiprows=steps//10//nPars*9//10)[:,1:-1].mean(axis=0)
     return outPars, fun(outPars)
-
  
-def deep_getsizeof(o, ids):
+def deep_getsizeof(obj, ids):
     """Find the memory footprint of a Python object
  
     This is a recursive function that drills down a Python object graph
@@ -255,23 +261,23 @@ def deep_getsizeof(o, ids):
     :param ids:
     :return:
     """
-    from collections import Mapping, Container
+    from collections.abc import Mapping, Container
     from sys import getsizeof
 
     d = deep_getsizeof
-    if id(o) in ids:
+    if id(obj) in ids:
         return 0
  
-    r = getsizeof(o)
-    ids.add(id(o))
+    curr_size = getsizeof(obj)
+    ids.add(id(obj))
  
-    if isinstance(o, str): # Removed isinstance(o, unicode) as it is not defined in Python 3
-        return r
+    if isinstance(obj, str) or isinstance(0, str):
+        return curr_size
  
-    if isinstance(o, Mapping):
-        return r + sum(d(k, ids) + d(v, ids) for k, v in o.iteritems())
+    if isinstance(obj, Mapping):
+        return curr_size + sum(d(key, ids) + d(val, ids) for key, val in obj.iteritems())
  
-    if isinstance(o, Container):
-        return r + sum(d(x, ids) for x in o)
+    if isinstance(obj, Container):
+        return curr_size + sum(d(x, ids) for x in obj)
  
-    return r 
+    return curr_size 
