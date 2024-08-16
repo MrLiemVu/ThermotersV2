@@ -2,13 +2,12 @@ from sys import path as syspath
 syspath.append("../")
 
 import numpy as np
-from .general_functions import multi_map
-from .model_functions import getBricks
+from functions.general_functions import multi_map, tensum, bindingEnergies, getDiNu
+from functions.model_functions import getBricks
 try: 
     from scipy.special import logsumexp
 except: 
     from scipy.misc import logsumexp
-from .fastFunctions import tensum, bindingEnergies, getDiNu
 
 class ThermodynamicModel:
     def __init__(self, parameters):

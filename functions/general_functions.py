@@ -281,3 +281,56 @@ def deep_getsizeof(obj, ids):
         return curr_size + sum(d(x, ids) for x in obj)
  
     return curr_size 
+
+import numpy as np
+
+def tensum(values, indices):
+    """
+    Calculates the sum of values at specified indices.
+
+    Args:
+        values: A 1D numpy array of values.
+        indices: A 2D numpy array of indices, where each row represents a set of indices.
+
+    Returns:
+        A 1D numpy array of the same length as indices, where each element is the sum of values at the corresponding indices.
+    """
+    return np.array([np.sum(values[idx]) for idx in indices])
+
+def bindingEnergies(matrix, sequences):
+    """
+    Calculates the binding energies of sequences to a matrix.
+
+    Args:
+        matrix: A 2D numpy array representing the binding matrix.
+        sequences: A 2D numpy array of sequences, where each row represents a sequence.
+
+    Returns:
+        A 1D numpy array of binding energies, where each element corresponds to the binding energy of the corresponding sequence.
+    """
+    return np.array([np.sum(matrix[seq]) for seq in sequences])
+
+def getDiNu(coord1, coord2, n1, minSpacer, n2, sequences, nSpacer):
+    """
+    Calculates the dinucleotide indices for a given set of coordinates.
+
+    Args:
+        coord1: The first coordinate.
+        coord2: The second coordinate.
+        n1: The size of the first matrix.
+        minSpacer: The minimum spacer length.
+        n2: The size of the second matrix.
+        sequences: A 2D numpy array of sequences.
+        nSpacer: The number of spacers.
+
+    Returns:
+        A 2D numpy array of dinucleotide indices, where each row represents a dinucleotide index.
+    """
+    nSeq, seqL = sequences.shape
+    Lout = seqL - n1 - n2 - minSpacer + 1
+    out = np.zeros((nSpacer, Lout, nSeq), dtype=int)
+    for iS in range(nSpacer):
+        for iL in range(Lout):
+            for iSeq in range(nSeq):
+                out[iS, iL, iSeq] = sequences[iSeq, coord1 + iL + iS] * n1 + sequences[iSeq, coord2 + iL + iS]
+    return out

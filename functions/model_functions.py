@@ -4,10 +4,11 @@ syspath.append("../")
 from collections import OrderedDict
 import numpy as np
 from functions.general_functions import multi_map
+from functions.general_functions import tensum, bindingEnergies, getDiNu
 from scipy.special import logsumexp
 # from scipy.misc import logsumexp
 
-from functions.fastFunctions import tensum, bindingEnergies, getDiNu
+# from functions.fastFunctions import tensum, bindingEnergies, getDiNu
     
 def slideSingleMatrix(m, seqs):
     '''
