@@ -118,7 +118,7 @@ def autocorr(sett, dtrange, nsplits = 1):
         out = array(out)
         return ( mean(out,axis=0), std(out,axis=0) )
 
-def OU(theta,mu,sigma,tmax,x0,dt):
+def OU(theta, mu, sigma, tmax, x0, dt):
     '''
     Simulate an Ornstein-Uhlenbeck process with parameters theta, mu, sigma
     and initial condition x0 for a time tmax with time step dt.
@@ -159,20 +159,23 @@ def order(testlist):
     tmp = sorted([[i, el] for i, el in enumerate(testlist)], key=lambda xi: xi[1])
     return np.array([el[0] for el in tmp])
     
-def tally(mylist):
+def tally(mylist, pandas=False):
     ''' 
     Tally elements in a list
     
     Parameters:
         mylist : The list to tally.
+        pandas : Whether to tally from pandas series, default = False.
     
     Returns:
         out : The tally of the elements in the list.
     '''
-    from collections import Counter
+    if pandas:
+        import pandas as pd
+        return pd.Series(mylist).value_counts().sort_index()
     
+    from collections import Counter
     return sorted(Counter(mylist).most_common(), key=lambda duple: duple[0])
-
 
 def multi_map(some_function, iterable, processes=1):
     '''
@@ -288,7 +291,7 @@ def tensum(values, indices):
     """
     Calculates the sum of values at specified indices.
 
-    Args:
+    Parameters:
         values: A 1D numpy array of values.
         indices: A 2D numpy array of indices, where each row represents a set of indices.
 
@@ -301,7 +304,7 @@ def bindingEnergies(matrix, sequences):
     """
     Calculates the binding energies of sequences to a matrix.
 
-    Args:
+    Parameters:
         matrix: A 2D numpy array representing the binding matrix.
         sequences: A 2D numpy array of sequences, where each row represents a sequence.
 
@@ -314,7 +317,7 @@ def getDiNu(coord1, coord2, n1, minSpacer, n2, sequences, nSpacer):
     """
     Calculates the dinucleotide indices for a given set of coordinates.
 
-    Args:
+    Parameters:
         coord1: The first coordinate.
         coord2: The second coordinate.
         n1: The size of the first matrix.

@@ -1,4 +1,4 @@
-from td_model import ThermodynamicModel
+from util.td_model import ThermodynamicModel
 from sklearn.linear_model import LinearRegression
 import numpy as np
 

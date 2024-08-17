@@ -9,13 +9,33 @@ Abstract Predicting gene expression levels from any DNA sequence is a major chal
 The research was conducted at the Institute of Science and Technology Austria, from 2015-2019.
 
 # ISSUES
+
 Shuffled_matrices [plots].ipynb
-    freeE_[5]_with_pwi.npy NOT EXIST
+    ! not found: freeE_[5]_with_pwi.npy
+    ! not found: nbdumps/shuffled_matrix_genome_free_energies_without_pwi.dmp
+    ! not found: nbdumps/shuffled_matrix_genome_free_energies_with_pwi.dmp
+    ! not found: nbdumps/shuffled_matrix_genome_free_energies_with_pwi_reindexed.dmp
 
 Shuffled_matrices [create histogram].ipynb
-    nbdumps/shuffled_matrix_genome_free_energies_without_pw.dmp
+    ! not found: nbdumps/shuffled_matrix_genome_free_energies_without_pw.dmp
+    ! not found: nbdumps/shuffled_matrix_genome_free_energies_with_pwi_reindexed.dmp
+    ! not found: ../data/Ecoli/freeE_[5]_without_pwi.npy
+    
+Reviewers_Ultrecho.ipynb
+    ! not found: ../data/review_datasets/GSE108535_sigma70_variant_data.txt
 
-General_functions
-    Get MCMC To work
+Reviewers_Johns.ipynb
+    ! not found: review_datasets/Data for Srdjan(2).xlsx
 
-fastFunctions, how to set up
+Reviewers_Hossain.ipynb
+    Deleted Code in cells?? See output but no code
+
+Model_parameters.ipynb
+    First image different from previous output
+
+Comparison_to_random_genome_with_pwi.ipynb
+    ! not found: reeE_[5]_with_pwi.npy
+    ! not found: nbdumps/random_genome_free_energies_with_pwi.dmp
+    
+Filtering_Pr_Pl.ipynb
+    ! not found: raw/NG-9349_LamPr12_mutlibrary_lib118631_4582_1_restricted.dmp
