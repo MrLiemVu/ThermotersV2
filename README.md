@@ -15,6 +15,10 @@ The research was conducted at the Institute of Science and Technology Austria, f
 * models - trained models
 * notebooks - notebook uses 
 
+# Use
+
+    pip install -r requirements.txt
+
 # ISSUES
 
 Shuffled_matrices [plots].ipynb

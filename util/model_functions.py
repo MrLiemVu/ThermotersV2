@@ -77,7 +77,9 @@ def getBricks(twoMatrices,
 
     return effergies
 
-def getBrickDict(seqDict,mdl,dinucl=False,
+def getBrickDict(seqDict,
+                 mdl,
+                 dinucl=False,
                  subtractChemPot=True,
                  useChemPot="chem.pot",
                  makeLengthConsistent=False,
@@ -238,8 +240,8 @@ def lps2eval(fitpar, objF, numData,
         fit = "train" in tt
     if useChemPot is None:
         try:
-            fitpar["chem.pot_%s"%objF]
-            useChemPot = "chem.pot_%s"%objF
+            fitpar["chem.pot_%s" % objF]
+            useChemPot = "chem.pot_%s" % objF
         except:
             useChemPot = "chem.pot"
 #         print ("using", useChemPot)
