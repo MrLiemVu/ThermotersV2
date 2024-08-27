@@ -27,6 +27,7 @@ def dict2tdm(model, treat_as = "36N"):
     del a["ThDict"]
     return ThermodynamicModel(a)
 
+
 def evaluate_model(model_, bricks_, delta_mu, detection_th, loglums, weights=None, ax=None, c=None, forceLinear=False):
     '''
     Evaluate a model.
@@ -45,16 +46,21 @@ def evaluate_model(model_, bricks_, delta_mu, detection_th, loglums, weights=Non
     Returns:
         score : float
     '''
+    
     pons_ = model_.bricks2pons({k:bricks_[k]-delta_mu for k in bricks_})
     x = np.log10(pons_)
     xmin = min(detection_th, np.percentile(x[np.isfinite(x)],.01))
     y = loglums.copy()
+    
     if weights is None:
         weights = np.ones(len(loglums))
+    
     if ax is not None:
         #ax.scatter(x, y, s=10*weights**.5, alpha= .5,c=c)
         ax.scatter(x, y, s=2, alpha= .5,c=c)
         #ax.axvline(detection_th, color="r", ls="--")
+    
+    # Fit a linear regression
     x = np.maximum(x,detection_th)
     linReg.fit(x.reshape(-1,1), y, sample_weight=weights)
     if forceLinear:
@@ -68,7 +74,23 @@ def evaluate_model(model_, bricks_, delta_mu, detection_th, loglums, weights=Non
         ax.plot([xmin, detection_th],[ypr[0]]*2,"C3")
     return score
 
+
 def find_detection_threshold(model_, bricks_, delta_mu, det_ths, loglums, weights=None, forceLinear=False):
+    '''
+    Find the detection threshold.
+    
+    Parameters:
+        model_ : ThermodynamicModel - The thermodynamic model
+        bricks_ : dict - The bricks
+        delta_mu : float - The delta mu
+        det_ths : numpy array - The detection thresholds
+        loglums : numpy array - The loglums
+        weights : numpy array - The weights. Default is None.
+        forceLinear : bool - Whether to force linear regression. Default is False.
+    
+    Returns:
+        score : dict - The score
+    '''
     scores = []
     for det_th in det_ths:
         scores += [evaluate_model(model_, bricks_, delta_mu, det_th, loglums, weights=weights, forceLinear=forceLinear)]
@@ -78,9 +100,26 @@ def find_detection_threshold(model_, bricks_, delta_mu, det_ths, loglums, weight
         "all_res": (det_ths, scores)
     }
 
+
 def find_delta_mu(model_, bricks_, delta_mus, loglums, weights=None, ax=None, forceLinear=False):
+    '''
+    Finds the optimal delta mu and detection threshold with associated score and results.
+    
+    Parameters:
+        model_ : ThermodynamicModel - The thermodynamic model
+        bricks_ : dict - The bricks
+        delta_mus : numpy array - The delta mus
+        loglums : numpy array - The loglums
+        weights : numpy array - The weights. Default is None.
+        ax : matplotlib axis - The axis. Default is None.
+        forceLinear : bool - Whether to force linear regression. Default is False.
+    
+    Returns:
+        score : dict - The score
+    '''
     scores = []
     detths = []
+    
     for delta_mu in delta_mus:
         pons_ = model_.bricks2pons({k:bricks_[k]-delta_mu for k in bricks_})
         logpons = np.log10(pons_)
@@ -91,6 +130,7 @@ def find_delta_mu(model_, bricks_, delta_mus, loglums, weights=None, ax=None, fo
             ax.plot(*tmp["all_res"], label=delta_mu)
         scores += [evaluate_model(model_, bricks_, delta_mu, tmp["detection_th_opt"], loglums, weights=weights, forceLinear=forceLinear)]
         detths += [tmp["detection_th_opt"]]
+        
     return {
         "delta_mu_opt": delta_mus[np.argmax(scores)],
         "detection_th_opt": detths[np.argmax(scores)],

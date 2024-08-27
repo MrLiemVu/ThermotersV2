@@ -2,12 +2,8 @@ from sys import path as syspath
 syspath.append("../")
 
 import numpy as np
-from util.general_functions import multi_map, tensum, bindingEnergies, getDiNu
+from util.general_functions import multi_map, tensum, getDiNu
 from util.model_functions import getBricks
-try: 
-    from scipy.special import logsumexp
-except: 
-    from scipy.misc import logsumexp
 
 class ThermodynamicModel:
     def __init__(self, parameters):
@@ -22,10 +18,10 @@ class ThermodynamicModel:
           dinuCoordsAndValues: a tuple of two lists. The first list contains the coordinates of 
                             dinucleotides in the sequence and the second list contains the values of the dinucleotides.
         
-        Outputs:
+        Returns:
           bricks: a dictionary with keys "frw" and "rc" where the values are 2D numpy arrays
-                of shape (n, L) representing the bricks for the forward and reverse complement
-                strands respectively.
+                  of shape (n, L) representing the bricks for the forward and reverse complement
+                  strands respectively.
         '''
         # 1. Extract the dinucleotide coordinates and values
         if dinuCoordsAndValues is not None:
@@ -76,16 +72,19 @@ class ThermodynamicModel:
             bricks[strand] = tmp
         return bricks
 
-    '''
-    Converts bricks to Pons for a given set of bricks.
-    
-    Inputs:
-      bricks: a dictionary with keys "frw" and "rc" where the values are 2D numpy arrays
-              of shape (n, L) representing the bricks for the forward and reverse complement
-              strands respectively.
-    '''
     def bricks2pons(self, bricks):
+        '''
+        Converts bricks to Pons for a given set of bricks.
         
+        Parameters:
+            bricks: a dictionary with keys "frw" and "rc" where the values are 2D numpy arrays
+                    of shape (n, L) representing the bricks for the forward and reverse complement
+                    strands respectively.
+        
+        Returns:
+            Pons: a 2D numpy array of shape (n, L) representing the Pons for the forward and reverse complement
+                  strands respectively.
+        '''
         # Check if the logClearanceRate parameter is present
         if "logClearanceRate" in self.params:
             R_ = np.exp(self.params["logClearanceRate"])
@@ -128,9 +127,7 @@ class ThermodynamicModel:
         Pons_ = sumON_ / (1. + sumOFF_ + sumON_)
         
         return Pons_
-    
-    '''
-    Returns string representation of model's parameters
-    '''
+
     def __repr__(self):
+        '''Returns string representation of model's parameters'''
         return self.params.__repr__()

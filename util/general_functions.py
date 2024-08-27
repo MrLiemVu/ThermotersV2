@@ -124,6 +124,12 @@ def OU(theta, mu, sigma, tmax, x0, dt):
     and initial condition x0 for a time tmax with time step dt.
     
     Parameters:
+        theta : The parameter of the Ornstein-Uhlenbeck process.
+        mu : The mean of the Ornstein-Uhlenbeck process.
+        sigma : The standard deviation of the Ornstein-Uhlenbeck process.
+        tmax : The maximum time.
+        x0 : The initial condition.
+        dt : The time step.
     
     Returns:
     
@@ -143,12 +149,12 @@ def OU(theta, mu, sigma, tmax, x0, dt):
     return x
 
 
-def order(testlist):
+def order(unordered_list):
     '''
     Return the order of elements in a list.
     
     Parameters:
-        testlist : The list to order.
+        unordered_list : The list to order.
     
     Returns:
         out : The order of the elements in the list.
@@ -156,7 +162,7 @@ def order(testlist):
     import numpy as np
     
 
-    tmp = sorted([[i, el] for i, el in enumerate(testlist)], key=lambda xi: xi[1])
+    tmp = sorted([[i, el] for i, el in enumerate(unordered_list)], key=lambda xi: xi[1])
     return np.array([el[0] for el in tmp])
     
 def tally(mylist, pandas=False):

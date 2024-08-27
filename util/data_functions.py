@@ -8,10 +8,10 @@ def getRBSpositions(data):
     '''
     Find the position of the RBS in the sequence.
     
-    Inputs:
+    Parameters:
         data: pandas DataFrame
         
-    Outputs:
+    Returns:
         rbspos: int
     '''
     rbs_seq = "aggag" #"aggagaag"
@@ -26,13 +26,13 @@ def splitDataset(data,
     '''
     Split data into training, validation and evaluation sets.
     
-    Inputs:
+    Parameters:
         data: pandas DataFrame
         split_fractions: array of floats summing to 1
         split_names: list of strings
         rndSeed: int
     
-    Outputs:
+    Returns:
         data: pandas DataFrame with new column "data split"
     '''
     assert split_fractions.sum() == 1
@@ -51,13 +51,13 @@ def numerizeSequences(sequences, Ltot=105, pad="a", start=0):
     '''
     Convert a list of sequences to a numerical representation.
     
-    Inputs:
+    Parameters:
         sequences: list of strings
         Ltot: int  # Total length of the sequence
         pad: string  # Padding character
         start: int  # Start position
         
-    Outputs:
+    Returns:
         out: numpy array of integers
     '''
     from pandas import Series
@@ -81,12 +81,12 @@ def createNumData(
     '''
     Create numerical data from a dictionary of dataframes.
 
-    Inputs:
+    Parameters:
         DataDict: dictionary of pandas DataFrames
         tts: list of strings
         rndSeed: int
     
-    Outputs:
+    Returns:
         numDataDict: dictionary of dictionaries of numpy arrays
     '''
     numDataDict = OrderedDict([(k, OrderedDict()) for k in tts])

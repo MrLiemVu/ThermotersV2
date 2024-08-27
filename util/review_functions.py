@@ -22,8 +22,6 @@ def import_Zhou(
     seqLength = data["seq_length"].value_counts().index[0]
     print (f"considering a consensus seqeunce length of {seqLength}")
     
-    
-    
     print (f"Considering Shine-Delgarno: '{shinedalgarno}'")
     data["ShineDelgarnoPos"] = data['sequence'].apply(lambda xi: xi.find( shinedalgarno) )
     print ("Here is a tally of Shine-Delgarno positions (-1 means SD is not being found, i.e. is being mutated)")

@@ -10,13 +10,16 @@ def hamming_distance(s1, s2):
         raise ValueError("Undefined for sequences of unequal length")
     return sum(ch1 != ch2 for ch1, ch2 in zip(s1, s2))
 
+
 def aln(seq1, seq2):
     '''Returns the alignment of two sequences.'''
     return pairwise2.align.localms(seq1, seq2, 1, 0, -1.1, -.5)[0]
-    
+
+
 def printaln(alignment):
     '''Prints the alignment of two sequences.'''
     print (pairwise2.format_alignment(*alignment))
+
 
 def askn(list, n):
     '''
@@ -34,6 +37,7 @@ def askn(list, n):
     except: 
         out = None
     return out
+
 
 def get_diffs(wt, seq):
     '''
@@ -110,6 +114,7 @@ def compare_to(wt, mut, trimmed=False, show=False):
         if show:
             printseqs(s1,s2)
         return   get_diffs(s1,s2)
+
 
 def printseqs(seq1, seq2, onlySecond=False):         
     '''

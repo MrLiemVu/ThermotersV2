@@ -10,36 +10,41 @@ from scipy.special import logsumexp
 
 # from functions.fastFunctions import tensum, bindingEnergies, getDiNu
     
-def slideSingleMatrix(m, seqs):
+def slideSingleMatrix(m: np.array, seqs: np.array) -> np.array:
     '''
     Calculate the energy of binding for each sequence in a matrix.
     
-    Inputs:
+    Parameters:
         m: numpy array
         seqs: numpy array
         
-    Outputs:
+    Returns:
         np.array([bindingEnergies(m,seqs[:,offset:offset+m.shape[0]]) for offset in range(Lout)]).T: numpy array
     '''
     Lout = seqs.shape[1]-m.shape[0]+1
     return np.array([bindingEnergies(m,seqs[:,offset:offset+m.shape[0]]) for offset in range(Lout)]).T
 
-def getBricks(twoMatrices,
-              minSpacer,
-              spacerPenalties,
-              sequences,
-              makeLengthConsistent=False):
+def getBricks(twoMatrices: list[list[int]],
+              minSpacer: int,
+              spacerPenalties: np.array,
+              sequences: np.array,
+              makeLengthConsistent=False) -> np.array:
     '''
     Calculate the energy of binding for each sequence in a matrix.
     
-    Inputs:
-        twoMatrices: list of numpy arrays
+    Parameters:
+        twoMatrices: list
+            Energy contribution from two different part of the sequences
         minSpacer: int
+            Minimum spacer length
         spacerPenalties: numpy array
+            Penalty for each spacer
         sequences: numpy array
+            Sequences to calculate the energy of binding for
         makeLengthConsistent: boolean
+            Whether to make the length of the sequences consistent. Default = False.
         
-    Outputs:
+    Returns:
         effergies: numpy array
     '''
     n1, n2 = [m.shape[0] for m in twoMatrices]
@@ -87,16 +92,23 @@ def getBrickDict(seqDict,
     '''
     Calculate the energy of binding for each sequence in a dictionary of sequences.
     
-    Inputs:
+    Parameters:
         seqDict: dictionary of numpy arrays
+            Sequences to calculate the energy of binding for
         mdl: dictionary
+            Model parameters
         dinucl: boolean
+            Whether to calculate the energy of binding for dinucleotides. Default = False.
         subtractChemPot: boolean
+            Whether to subtract the chemical potential from the energy of binding. Default = True.
         useChemPot: string
+            Chemical potential to subtract from the energy of binding. Default = "chem.pot"
         makeLengthConsistent: boolean
+            Whether to make the length of the sequences consistent. Default = False.
         dinuCoordsAndValues: tuple
+            dinucleotide coordinates and values. Default = None.
         
-    Outputs:
+    Returns:
         out: dictionary of numpy arrays
     '''
     if dinucl:
@@ -162,30 +174,42 @@ def brick2lps(bricks_DNIs,
     '''
     Calculate the log10 of the probability of occupancy for each sequence in a dictionary of bricks.
     
-    Inputs:
+    Parameters:
         bricks_DNIs: dictionary of numpy arrays
+            Sequences to calculate the log10 of the probability of occupancy for
         fitpars: dictionary
+            Fit parameters
         thresholdPosDict_: dictionary
+            Threshold position for each data set. Default = None.
         bindMode_: string
+            Binding mode. Default = None.
         useChemPot: string
+            Chemical potential to subtract from the energy of binding. Default = "chem.pot"
         
-    Outputs:
+    Returns:
         out: dictionary of numpy arrays
     '''
     out = {}               
-    if thresholdPosDict_ is None:
+    if thresholdPosDict_ is None: # No threshold position given
         thresholdPosDict_ = fitpars["ThDict"]
-    if bindMode_ is None:
+    if bindMode_ is None: # No bindMode given
         bindMode_ = fitpars["bindMode"]
+    
+    # Try to get clearance rate
     try:
         R_ = np.exp(fitpars["logClearanceRate"])
     except:
         R_ = None
+    
+    # Loop over bricks
     for dataID_ in bricks_DNIs:
-        if "_rc" in dataID_: 
+        if "_rc" in dataID_: # Skip reverse complement?
             continue
+        
+        # Get binding energies
         bdni = bricks_DNIs[dataID_]
         
+        # Get threshold position
         try:
             thresholdPos = thresholdPosDict_.get(dataID_, thresholdPosDict_["Prl"])
         except:
@@ -196,7 +220,10 @@ def brick2lps(bricks_DNIs,
         if thresholdPos <= 0:
             thresholdPos = bdni.shape[1] + thresholdPos
 
-        off = thresholdPos<bdni.shape[1]
+        # If the bricks d n i
+        off = thresholdPos < bdni.shape[1]
+        
+        # Handle bind mode
         if bindMode_ == "add":
             if R_ is None:
                 bindF = lambda xi: -logsumexp(-xi, axis = tuple(range(1, xi.ndim)))
@@ -205,19 +232,24 @@ def brick2lps(bricks_DNIs,
                                     1.0/(np.exp(xi) + R_),
                                     axis = tuple(range(1,xi.ndim))
                                             ))
-        if bindMode_ == "max":
+        elif bindMode_ == "max":
             bindF = lambda xi: np.min(xi, axis = tuple(range(1, xi.ndim)))
+        
+        # 
         effON_ = bindF(bdni[:, :thresholdPos])
         if off:
             effOFF_ = bindF(bdni[:, thresholdPos:])
         else:
             effOFF_ = 0.
+        
+        # Reverse complement
         if dataID_ + "_rc" in bricks_DNIs:
             bdni_rc = bricks_DNIs[dataID_ + "_rc"]
             rcOcclusion = fitpars.get("rcOcclusion", np.arange(bdni_rc.shape[1]))
             effOFF_ += bindF(bdni_rc[:, rcOcclusion])
         Pons_ = np.exp(-effON_) / (1.0 + np.exp(-effON_) + np.exp(-effOFF_))
         out[dataID_] = np.log10(Pons_)
+    
     return out
     
 
@@ -233,7 +265,26 @@ def lps2eval(fitpar, objF, numData,
              dinuCoordsAndValues = None,
              useChemPot = None
              ):
-
+    '''
+    Calculate the evaluation of the log10 of the probability of occupancy for each sequence in a dictionary of bricks.
+    
+    Parameters:
+        fitpar: dictionary
+        objF: string
+        numData: dictionary
+        DataIDs_: list
+        tt: string
+        fit: boolean
+        logPonDict_: dictionary
+        bricks_: dictionary
+        binEdges_: dictionary
+        dinucl: boolean
+        dinuCoordsAndValues: tuple
+        useChemPot: string
+        
+    Returns:
+        out: dictionary of numpy arrays
+    '''
     if DataIDs_ is None:
         DataIDs_ = fitpar["DataIDs"]
     if fit is None:
