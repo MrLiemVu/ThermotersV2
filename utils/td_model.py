@@ -2,8 +2,8 @@ from sys import path as syspath
 syspath.append("../")
 
 import numpy as np
-from util.general_functions import multi_map, tensum, getDiNu
-from util.model_functions import getBricks
+from utils.general_functions import multi_map, tensum, getDiNu
+from utils.model_functions import getBricks
 
 class ThermodynamicModel:
     def __init__(self, parameters):

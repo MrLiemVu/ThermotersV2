@@ -1,8 +1,4 @@
 
-# Imports
-from collections.abc import Mapping, Container
-from sys import getsizeof
-
 # find positions of elements in the list
 def pozicija(testlist, cond):
     '''
@@ -311,35 +307,66 @@ def bindingEnergies(matrix, sequences):
     Calculates the binding energies of sequences to a matrix.
 
     Parameters:
-        matrix: A 2D numpy array representing the binding matrix.
-        sequences: A 2D numpy array of sequences, where each row represents a sequence.
+        matrix: A 2D numpy array representing the binding matrix. matrix.shape is (L,4)
+        sequences: A 2D numpy array of sequences, where each row represents a sequence. seqs.shape is (n, L),
 
     Returns:
         A 1D numpy array of binding energies, where each element corresponds to the binding energy of the corresponding sequence.
     """
-    return np.array([np.sum(matrix[seq]) for seq in sequences])
+    assert matrix.shape[0] == sequences.shape[1]
+    ns = len(sequences)
+    L = len(sequences[0])
+    energies = np.zeros(ns)
+    for i in range(ns):
+        for j in range(L):
+            energies[i] += matrix[j, sequences[i, j]]
+    return energies
+    # return np.array([np.sum(matrix[seq]) for seq in sequences])
 
-def getDiNu(coord1, coord2, n1, minSpacer, n2, sequences, nSpacer):
-    """
-    Calculates the dinucleotide indices for a given set of coordinates.
+# def getDiNu(coord1, coord2, n1, minSpacer, n2, sequences, nSpacer):
+#     """
+#     Calculates the dinucleotide indices for a given set of coordinates.
 
-    Parameters:
-        coord1: The first coordinate.
-        coord2: The second coordinate.
-        n1: The size of the first matrix.
-        minSpacer: The minimum spacer length.
-        n2: The size of the second matrix.
-        sequences: A 2D numpy array of sequences.
-        nSpacer: The number of spacers.
+#     Parameters:
+#         coord1: The first coordinate.
+#         coord2: The second coordinate.
+#         n1: The size of the first matrix.
+#         minSpacer: The minimum spacer length.
+#         n2: The size of the second matrix.
+#         sequences: A 2D numpy array of sequences.
+#         nSpacer: The number of spacers.
 
-    Returns:
-        A 2D numpy array of dinucleotide indices, where each row represents a dinucleotide index.
-    """
-    nSeq, seqL = sequences.shape
-    Lout = seqL - n1 - n2 - minSpacer + 1
-    out = np.zeros((nSpacer, Lout, nSeq), dtype=int)
+#     Returns:
+#         A 2D numpy array of dinucleotide indices, where each row represents a dinucleotide index.
+#     """
+#     nSeq, seqL = sequences.shape
+#     Lout = seqL - n1 - n2 - minSpacer + 1
+#     out = np.zeros((nSpacer, Lout, nSeq), dtype=int)
+#     for iS in range(nSpacer):
+#         for iL in range(Lout):
+#             for iSeq in range(nSeq):
+#                 out[iS, iL, iSeq] = sequences[iSeq, coord1 + iL + iS] * n1 + sequences[iSeq, coord2 + iL + iS]
+#     return out
+
+def getDiNu(p1,b1,p2, b2, n1, minSpacer, n2, sequences, nSpacer):
+    
+    minMsize = minSpacer+n1+n2
+    nSeq = sequences.shape[0]
+    seqL = sequences.shape[1]
+    diNu = np.zeros((nSpacer,seqL-minMsize-nSpacer+1,nSeq),dtype=np.intc)#.astype(np.int32)
+    diNu_view = diNu.view()
+    
+    if p1>=n1: p1 -= nSpacer//2
+    if p2>=n1: p2 -= nSpacer//2
+
     for iS in range(nSpacer):
-        for iL in range(Lout):
-            for iSeq in range(nSeq):
-                out[iS, iL, iSeq] = sequences[iSeq, coord1 + iL + iS] * n1 + sequences[iSeq, coord2 + iL + iS]
-    return out
+        x0 = nSpacer-iS
+        for i in range(x0,seqL-minMsize-iS+1):
+            for js in range(nSeq):
+                if sequences[js][i+p1]==b1 and sequences[js][i+p2]==b2:
+                    diNu_view[iS,i-x0,js] = 1
+#                     diNu[iS,i-x0,js] = 1
+        if p1>=n1: p1 += 1
+        if p2>=n1: p2 += 1
+
+    return diNu

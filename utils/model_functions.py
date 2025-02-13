@@ -3,8 +3,7 @@ syspath.append("../")
 ## Definitions:
 from collections import OrderedDict
 import numpy as np
-from util.general_functions import multi_map
-from util.general_functions import tensum, bindingEnergies, getDiNu
+from utils.general_functions import multi_map, tensum, bindingEnergies, getDiNu
 from scipy.special import logsumexp
 # from scipy.misc import logsumexp
 

@@ -2,8 +2,8 @@ numpy==1.26.4
 pandas==2.2.2
 matplotlib==3.8.4
 scipy==1.13.0
-sklearn==1.13.0
-bio==1.84
+scikit-learn==1.6.1
+bio==1.7.1
 tensorflow==2.18.0
 keras_nlp # No version specified
 openpyxl==3.1.5
